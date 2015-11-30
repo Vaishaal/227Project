@@ -19,14 +19,6 @@ class BasicStochasticGradientMethod(object):
         self.num_iter = num_iter
         self._train_iter = 0
 
-    def objective_value(self):
-        '''
-            Return current "optimum" objective value
-            Arguments:
-                self (BasicStochasticGradientMethod): Object
-        '''
-        return self.objective(self.w)
-
     def train(self, gradients):
         '''
             Train with list of gradient
@@ -40,8 +32,6 @@ class BasicStochasticGradientMethod(object):
            prev_w = w
            w = w - self.eta_update(self._train_iter)*g(w)
            self._train_iter += 1
-           if (np.isclose(prev_w, w)):
-               break
         self.w = w
 
     def train_one(self, gradient):
@@ -53,7 +43,7 @@ class BasicStochasticGradientMethod(object):
                 X (np.ndarray): Matrix where every row is data point
         '''
 
-        self.w = self.w - self.eta_update(self._train_iter)*self.gradient(x)
+        self.w = self.w - self.eta_update(self._train_iter)*gradient(self.w)
         self._train_iter += 1
 
 
