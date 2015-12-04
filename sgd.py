@@ -1,4 +1,7 @@
 import numpy as np
+from numba import jit
+from numpy import arange
+import scipy
 
 class BasicStochasticGradientMethod(object):
     '''
@@ -19,7 +22,7 @@ class BasicStochasticGradientMethod(object):
         self._train_iter = 0
         self.state_check = state_check
 
-    def train(self, gradients, with_replacement=False):
+    def train(self, gradients):
         '''
             Train with list of gradient
 
@@ -27,14 +30,13 @@ class BasicStochasticGradientMethod(object):
                 self (BasicStochasticGradientMethod): Object
                 gradients (List[fn[np.ndarray -> float]]): List of gradient functions at various examples
         '''
-        if with_replacement:
-            shuffled_gradients = np.random.choice(gradients, len(gradients))
-        else:
-            shuffled_gradients = np.random.permutation(gradients)
-        for g in shuffled_gradients:
+        for g in gradients:
+            prev_w = self.w
             self.train_one(g)
             if (self.state_check):
                 self.state_check(self)
+            if np.allclose(prev_w, self.w):
+                break
 
     def train_one(self, gradient):
         '''
@@ -61,4 +63,17 @@ class ShamirStochasticGradientMethod(BasicStochasticGradientMethod):
         super(ShamirStochasticGradientMethod, self).train_one(gradient)
         self.w = self.w/np.linalg.norm(self.w)
 
+class AlectonStochasticGradientMethod(BasicStochasticGradientMethod):
+    '''
+        Stochastic gradient descent class for Shamir's SGD algorithm for PCA
+
+        Attributes:
+            w0 (np.ndarray): Starting w_0 (defaults to 0)
+            eta_update (fn[int -> float]) : (optional) The eta update rule (defaults to constant 0.01)
+        '''
+
+    def train_one(self, gradient):
+        super(AlectonStochasticGradientMethod, self).train_one(gradient)
+        normalization = scipy.linalg.sqrtm(np.linalg.pinv(self.w.T.dot(self.w)))
+        self.w = self.w.dot(normalization)
 

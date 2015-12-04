@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 experiments = ["shamirPCA", "strictSadddlePCA", "strictSaddleTensorDecomp", "strictSadddleNeuralNet"]
 
 def shamirPCA():
-    digits = sklearn.datasets.load_digits()
+    digits = sklearn.datasets.load_digits(2)
     X = digits.data
     w_star = np.linalg.svd(X)[-1][0]
 
