@@ -69,16 +69,22 @@ class AlectonPCA(object):
 
         def pca_objective(w, x):
                 x = x[np.newaxis].T
-                return -w.dot(x.dot(x.T)).dot(w)
+                return np.linalg.norm(w.dot(x.dot(x.T)).dot(w.T))
+
+        loss= []
+        def iteration_logger(sgd):
+            current_objective = objective(sgd.w.T)
+            loss.append(current_objective)
 
         self.pca_grad = pca_grad
         self.pca_objective = pca_objective
         pca_loss = EmpiricalLossFn(pca_objective, pca_grad)
         objective = pca_loss.partial_eval_objective_full(data)
-        sgd = AlectonStochasticGradientMethod(Y, step_fn)
+        sgd = AlectonStochasticGradientMethod(Y, step_fn, iteration_logger)
         gradients = [(pca_loss.partial_eval_gradient_streaming(x)) for x in data]
         sgd.train(gradients)
         sgd.train(gradients)
         sgd.train(gradients)
+        self.loss = loss
         self.pca_mat = sgd.w.T
 

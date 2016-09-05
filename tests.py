@@ -49,7 +49,7 @@ def hinge_loss_test():
     X = np.hstack((data,labels[np.newaxis].T))
     objective = hinge_loss.partial_eval_objective_full(X)
     gradients = [hinge_loss.partial_eval_gradient_streaming(x) for x in X]
-    sgd = BasicStochasticGradientMethod(np.zeros(data[0].shape), lambda x: 0.01)
+    sgd = BasicStochasticGradientMethod(np.zeros(data[0].shape), lambda x: 1)
 
     # Do 3 passes JIC
     sgd.train(gradients)
